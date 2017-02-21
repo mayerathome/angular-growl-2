@@ -87,7 +87,7 @@ angular.module("angular-growl").run(['$templateCache', function ($templateCache)
       '<button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="growlMessages.deleteMessage(message)" ng-if="!message.disableCloseButton">&times;</button>' +
       '<button type="button" class="close" aria-hidden="true" ng-if="showCountDown(message)">{{message.countdown}}</button>' +
       '<h4 class="growl-title" ng-if="message.title" ng-bind="message.title"></h4>' +
-      '<div class="growl-message" ng-bind-html="message.text"></div>' +
+      '<div class="growl-message" ng-bind-html="message.text" ng-click="message.growlClick(message.growlClickData);growlMessages.deleteMessage(message)"></div>' +
       '</div>' +
       '</div>'
     );

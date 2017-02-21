@@ -244,6 +244,8 @@ angular.module("angular-growl").provider("growl", function () {
       message = {
         text: text,
         title: _config.title,
+	growlClick: _config.growlClick,
+        growlClickData: _config.growlClickData,
         severity: severity,
         ttl: _config.ttl || _ttl[severity],
         variables: _config.variables || {},
