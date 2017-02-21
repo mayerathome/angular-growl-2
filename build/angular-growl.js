@@ -1,7 +1,7 @@
 /**
- * angular-growl-v2 - v0.7.8 - 2015-10-25
+ * angular-growl-v2 - v0.7.9 - 2017-02-21
  * http://janstevens.github.io/angular-growl-2
- * Copyright (c) 2015 Marco Rinck,Jan Stevens,Silvan van Leeuwen; Licensed MIT
+ * Copyright (c) 2017 Marco Rinck,Jan Stevens,Silvan van Leeuwen; Licensed MIT
  */
 angular.module('angular-growl', []);
 angular.module('angular-growl').directive('growl', [function () {
@@ -81,7 +81,7 @@ angular.module('angular-growl').run([
   function ($templateCache) {
     'use strict';
     if ($templateCache.get('templates/growl/growl.html') === undefined) {
-      $templateCache.put('templates/growl/growl.html', '<div class="growl-container" ng-class="wrapperClasses()">' + '<div class="growl-item alert" ng-repeat="message in growlMessages.directives[referenceId].messages" ng-class="alertClasses(message)" ng-click="stopTimeoutClose(message)">' + '<button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="growlMessages.deleteMessage(message)" ng-show="!message.disableCloseButton">&times;</button>' + '<button type="button" class="close" aria-hidden="true" ng-show="showCountDown(message)">{{message.countdown}}</button>' + '<h4 class="growl-title" ng-show="message.title" ng-bind="message.title"></h4>' + '<div class="growl-message" ng-bind-html="message.text"></div>' + '</div>' + '</div>');
+      $templateCache.put('templates/growl/growl.html', '<div class="growl-container" ng-class="wrapperClasses()">' + '<div class="growl-item alert" ng-repeat="message in growlMessages.directives[referenceId].messages" ng-class="alertClasses(message)" ng-click="stopTimeoutClose(message)">' + '<button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="growlMessages.deleteMessage(message)" ng-if="!message.disableCloseButton">&times;</button>' + '<button type="button" class="close" aria-hidden="true" ng-if="showCountDown(message)">{{message.countdown}}</button>' + '<h4 class="growl-title" ng-if="message.title" ng-bind="message.title"></h4>' + '<div class="growl-message" ng-bind-html="message.text" ng-click="message.growlClick(message.growlClickData);growlMessages.deleteMessage(message)"></div>' + '</div>' + '</div>');
     }
   }
 ]);
@@ -92,7 +92,7 @@ angular.module('angular-growl').provider('growl', function () {
       error: null,
       warning: null,
       info: null
-    }, _messagesKey = 'messages', _messageTextKey = 'text', _messageTitleKey = 'title', _messageSeverityKey = 'severity', _messageTTLKey = 'ttl', _onlyUniqueMessages = true, _messageVariableKey = 'variables', _referenceId = 0, _inline = false, _position = 'top-right', _disableCloseButton = false, _disableIcons = false, _reverseOrder = false, _disableCountDown = false, _translateMessages = true;
+    }, _messagesKey = 'messages', _messageTextKey = 'text', _messageTitleKey = 'title', _messageSeverityKey = 'severity', _messageTTLKey = 'ttl', _onlyUniqueMessages = true, _messageVariableKey = 'variables', _messageReferenceIdKey = 'referenceId', _referenceId = 0, _inline = false, _position = 'top-right', _disableCloseButton = false, _disableIcons = false, _reverseOrder = false, _disableCountDown = false, _translateMessages = true;
   this.globalTimeToLive = function (ttl) {
     if (typeof ttl === 'object') {
       for (var k in ttl) {
@@ -161,6 +161,10 @@ angular.module('angular-growl').provider('growl', function () {
     _messageTTLKey = messageTTLKey;
     return this;
   };
+  this.messageReferenceIdKey = function (messageReferenceIdKey) {
+    _messageReferenceIdKey = messageReferenceIdKey;
+    return this;
+  };
   this.onlyUniqueMessages = function (onlyUniqueMessages) {
     _onlyUniqueMessages = onlyUniqueMessages;
     return this;
@@ -220,6 +224,8 @@ angular.module('angular-growl').provider('growl', function () {
         message = {
           text: text,
           title: _config.title,
+          growlClick: _config.growlClick,
+          growlClickData: _config.growlClickData,
           severity: severity,
           ttl: _config.ttl || _ttl[severity],
           variables: _config.variables || {},
@@ -271,6 +277,9 @@ angular.module('angular-growl').provider('growl', function () {
             config.title = message[_messageTitleKey];
             if (message[_messageTTLKey]) {
               config.ttl = message[_messageTTLKey];
+            }
+            if (message[_messageReferenceIdKey]) {
+              config.referenceId = message[_messageReferenceIdKey];
             }
             sendMessage(message[_messageTextKey], config, severity);
           }
